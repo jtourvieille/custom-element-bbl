@@ -1,0 +1,61 @@
+﻿<RadzenCheckBoxList
+    Data="@data"
+    @bind-Value=@values
+    TValue="int"
+    TextProperty="Name"
+    ValueProperty="Id" 
+    AllowSelectAll="true"
+    SelectAllText="Select all items"
+    Orientation="Orientation.Vertical">
+    
+</RadzenCheckBoxList>
+
+<RadzenButton Icon="add_circle_outline" ButtonStyle="ButtonStyle.Primary" Click="AddClicked" />
+<RadzenButton Icon="highlight_off" ButtonStyle="ButtonStyle.Primary" Click="RemoveClicked" />
+
+@code {
+    IEnumerable<int> values = new int[] { 1 };
+
+    public class BlazorTodoItem
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    List<BlazorTodoItem> data = new()
+    {
+        new() { Id = 1 , Name = "Présenter Blazor au chapter DEV"},
+        new() { Id = 2 , Name = "Présenter Blazor au Radar techno"}
+    };
+
+    private void AddClicked()
+    {
+        Random rnd = new Random();
+        var randomIndex = rnd.Next(0, _todoBacklog.Length);
+
+        data.Add(new BlazorTodoItem
+        {
+                Id = data.Count > 0 ? data.Max(i => i.Id) + 1 : 1,
+                Name = _todoBacklog[randomIndex]
+        });
+    }
+
+    private static string[] _todoBacklog =
+    {
+        "Présenter Blazor au chapter DEV",
+        "Présenter Blazor au Radar techno",
+        "Faire un BBL sur Blazor",
+        "Faire un BBL sur Blazor & les custom elements",
+        "Présenter les custom elements au chapter DEV",
+        "Présenter les custom elements au codep",
+    };
+
+    private void RemoveClicked()
+    {
+        if (values != null && values.Any())
+        {
+            data.RemoveAll(item => values.Contains(item.Id));
+        }
+    }
+
+}
