@@ -1,12 +1,14 @@
 ﻿<RadzenCheckBoxList
     Data="@data"
-    @bind-Value=@values
+    Value=@Values
+    Change="OnChange"
     TValue="int"
     TextProperty="Name"
     ValueProperty="Id" 
     AllowSelectAll="true"
     SelectAllText="Select all items"
-    Orientation="Orientation.Vertical">
+    Orientation="Orientation.Vertical"
+    >
     
 </RadzenCheckBoxList>
 
@@ -14,12 +16,24 @@
 <RadzenButton Icon="highlight_off" ButtonStyle="ButtonStyle.Primary" Click="RemoveClicked" />
 
 @code {
-    IEnumerable<int> values = new int[] { 1 };
+    [Parameter]
+    public IEnumerable<int> Values { get; set; } = new[] { 1 };
+
+    [Parameter]
+    public EventCallback<IEnumerable<int>> SelectedValuesChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<IEnumerable<BlazorTodoItem>> ValuesChanged { get; set; }
 
     public class BlazorTodoItem
     {
         public int Id { get; set; }
         public string Name { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Id} - {Name}";
+        }
     }
 
     List<BlazorTodoItem> data = new()
@@ -28,7 +42,7 @@
         new() { Id = 2 , Name = "Présenter Blazor au Radar techno"}
     };
 
-    private void AddClicked()
+    private async Task AddClicked()
     {
         Random rnd = new Random();
         var randomIndex = rnd.Next(0, _todoBacklog.Length);
@@ -38,6 +52,11 @@
                 Id = data.Count > 0 ? data.Max(i => i.Id) + 1 : 1,
                 Name = _todoBacklog[randomIndex]
         });
+
+        if (ValuesChanged.HasDelegate)
+        {
+            await ValuesChanged.InvokeAsync(data);
+        }
     }
 
     private static string[] _todoBacklog =
@@ -50,12 +69,25 @@
         "Présenter les custom elements au codep",
     };
 
-    private void RemoveClicked()
+    private async Task RemoveClicked()
     {
-        if (values != null && values.Any())
+        if (Values != null && Values.Any())
         {
-            data.RemoveAll(item => values.Contains(item.Id));
+            data.RemoveAll(item => Values.Contains(item.Id));
+
+            if (ValuesChanged.HasDelegate)
+            {
+                await ValuesChanged.InvokeAsync(data);
+            }
         }
     }
 
+    private async Task OnChange(IEnumerable<int> obj)
+    {
+        Values = obj;
+        if (SelectedValuesChanged.HasDelegate)
+        {
+            await SelectedValuesChanged.InvokeAsync(Values);
+        }
+    }
 }

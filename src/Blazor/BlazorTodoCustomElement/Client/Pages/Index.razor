@@ -1,8 +1,37 @@
 ﻿@using BlazorTodoCustomElement.Client.CustomElement
-@using CustomElement;
+@using BlazorTodoCustomElement.Client.Components
 
 @page "/"
 
 <h1>Hello, world!</h1>
 
-<TodoCustomElement/>
+<TodoCustomElement ValuesChanged="ValuesChanged" SelectedValuesChanged="SelectedValuesChanged" />
+
+<EventConsole @ref=@console Class="rz-my-10 rz-mx-auto" Style="width: 700px;" />
+
+@code {
+    EventConsole console;
+
+    private void ValuesChanged(IEnumerable<TodoCustomElement.BlazorTodoItem> obj)
+    {
+        if (obj is null || !obj.Any())
+        {
+            console.Log("Aucun item");
+            return;
+        }
+
+        console.Log($"Liste des items : {String.Join(", ", obj)}");
+    }
+
+    private void SelectedValuesChanged(IEnumerable<int> obj)
+    {
+        if (obj is null || !obj.Any())
+        {
+            console.Log("Aucune sélection");
+            return;
+        }
+
+        console.Log($"Sélection: {String.Join(", ", obj)}");
+    }
+
+}
