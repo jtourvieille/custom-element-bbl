@@ -1,35 +1,98 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import TextField from "@mui/material/TextField";
+import "./App.css";
+import { Button, Checkbox, FormControlLabel, FormGroup } from "@mui/material";
+
+type Todo = {
+  id: number;
+  text: string;
+  completed: boolean;
+};
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [newTodo, setNewTodo] = useState<string>("");
 
   return (
     <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <FormGroup
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          gap: "1rem",
+        }}
+      >
+        <Button
+          variant="contained"
+          onClick={() => {
+            const todoNotCompleted = todos.filter(
+              (todo) => todo.completed === false
+            );
+            setTodos([...todoNotCompleted]);
+          }}
+        >
+          Clear selected
+        </Button>
+        <Button
+          variant="contained"
+          onClick={() => {
+            const newTodos = [...todos];
+            newTodos.forEach((todo) => (todo.completed = true));
+            setTodos([...newTodos]);
+          }}
+        >
+          Select all
+        </Button>
+      </FormGroup>
+      <FormGroup>
+        {todos.length > 0 ? todos.map((todo, index) => (
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={todo.completed}
+                onChange={(e) => {
+                  const newTodos = [...todos];
+                  newTodos[index].completed = e.target.checked;
+                  setTodos(newTodos);
+                }}
+              />
+            }
+            label={todo.text}
+          />
+        )): <p>No todos</p>}
+      </FormGroup>
+      <FormGroup
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          gap: "1rem",
+          marginTop: "1rem",
+        }}
+      >
+        <TextField
+          id="filled-basic"
+          label="Filled"
+          variant="filled"
+          value={newTodo}
+          onChange={(e) => {
+            setNewTodo(e.target.value);
+          }}
+        />
+        <Button
+          variant="contained"
+          onClick={() => {
+            setTodos([
+              ...todos,
+              { id: todos.length, text: newTodo, completed: false },
+            ]);
+            setNewTodo("");
+          }}
+        >
+          Add Todos
+        </Button>
+      </FormGroup>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
