@@ -8,9 +8,11 @@
     AllowSelectAll="true"
     SelectAllText="Select all items"
     Orientation="Orientation.Vertical"
-    >
+>
     
 </RadzenCheckBoxList>
+
+<RadzenTextBox @bind-Value="inputText" />
 
 <RadzenButton Icon="add_circle_outline" ButtonStyle="ButtonStyle.Primary" Click="AddClicked" />
 <RadzenButton Icon="highlight_off" ButtonStyle="ButtonStyle.Primary" Click="RemoveClicked" />
@@ -25,6 +27,8 @@
     [Parameter]
     public EventCallback<IEnumerable<BlazorTodoItem>> ValuesChanged { get; set; }
 
+    private string inputText;
+
     public class BlazorTodoItem
     {
         public int Id { get; set; }
@@ -36,38 +40,23 @@
         }
     }
 
-    List<BlazorTodoItem> data = new()
-    {
-        new() { Id = 1 , Name = "Présenter Blazor au chapter DEV"},
-        new() { Id = 2 , Name = "Présenter Blazor au Radar techno"}
-    };
+    List<BlazorTodoItem> data = new();
 
     private async Task AddClicked()
     {
-        Random rnd = new Random();
-        var randomIndex = rnd.Next(0, _todoBacklog.Length);
-
         data.Add(new BlazorTodoItem
         {
                 Id = data.Count > 0 ? data.Max(i => i.Id) + 1 : 1,
-                Name = _todoBacklog[randomIndex]
+                Name = inputText
         });
 
         if (ValuesChanged.HasDelegate)
         {
             await ValuesChanged.InvokeAsync(data);
         }
-    }
 
-    private static string[] _todoBacklog =
-    {
-        "Présenter Blazor au chapter DEV",
-        "Présenter Blazor au Radar techno",
-        "Faire un BBL sur Blazor",
-        "Faire un BBL sur Blazor & les custom elements",
-        "Présenter les custom elements au chapter DEV",
-        "Présenter les custom elements au codep",
-    };
+        inputText = string.Empty;
+    }
 
     private async Task RemoveClicked()
     {
